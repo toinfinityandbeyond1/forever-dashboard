@@ -8,6 +8,32 @@
     <h1>⏳ Forever Automation Dashboard</h1>
     <div id="status"></div>
 
+    <h2>💾 Storage Overview</h2>
+<div id="storage-overview"></div>
+
+<script>
+fetch("./storage.json")
+  .then(res => res.json())
+  .then(data => {
+    const table = `<table border="1" cellpadding="4">
+      <tr><th>Storage Option</th><th>Max Storage</th><th>Used Storage</th><th>Notes</th></tr>
+      ${data.storage_options.map(opt => `
+        <tr>
+          <td>${opt.name}</td>
+          <td>${opt.max_storage}</td>
+          <td>${opt.used_storage}</td>
+          <td>${opt.notes}</td>
+        </tr>
+      `).join("")}
+    </table>`;
+    document.getElementById("storage-overview").innerHTML = table;
+  })
+  .catch(err => {
+    document.getElementById("storage-overview").innerHTML = "<p>Error loading storage info.</p>";
+    console.error(err);
+  });
+</script>
+
     <script>
         // Relative path to JSON, no username or repo hard-coded
         const url = "./status.json";
