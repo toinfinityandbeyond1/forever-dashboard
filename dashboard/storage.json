@@ -1,0 +1,16 @@
+{
+  "storage_options": [
+    {
+      "name": "GitHub",
+      "max_storage": "1 GB",
+      "used_storage": "0.04 MB",
+      "notes": "JSON logs, static data"
+    },
+    {
+      "name": "Supabase",
+      "max_storage": "500 MB",
+      "used_storage": "unknown",
+      "notes": "SQL tables, real-time updates"
+    }
+  ]
+}

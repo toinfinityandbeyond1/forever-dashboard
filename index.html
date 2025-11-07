@@ -9,12 +9,14 @@
     <div id="status"></div>
 
     <h2>💾 Storage Overview</h2>
+<button id="refresh-storage">Refresh Storage Data</button>
 <div id="storage-overview"></div>
 
 <script>
-fetch("./storage.json")
-  .then(res => res.json())
-  .then(data => {
+async function loadStorage() {
+  try {
+    const res = await fetch("./storage.json?cachebust=" + new Date().getTime());
+    const data = await res.json();
     const table = `<table border="1" cellpadding="4">
       <tr><th>Storage Option</th><th>Max Storage</th><th>Used Storage</th><th>Notes</th></tr>
       ${data.storage_options.map(opt => `
@@ -27,11 +29,17 @@ fetch("./storage.json")
       `).join("")}
     </table>`;
     document.getElementById("storage-overview").innerHTML = table;
-  })
-  .catch(err => {
+  } catch (err) {
     document.getElementById("storage-overview").innerHTML = "<p>Error loading storage info.</p>";
     console.error(err);
-  });
+  }
+}
+
+// initial load
+loadStorage();
+
+// refresh button
+document.getElementById("refresh-storage").addEventListener("click", loadStorage);
 </script>
 
     <script>
