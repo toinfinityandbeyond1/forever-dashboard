@@ -1,16 +1,18 @@
 import json, datetime, random, os
 
-# --- Existing status.json logic ---
-data = {
+# --- Existing status.json ---
+status = {
     "timestamp": datetime.datetime.utcnow().isoformat(),
     "records_collected": random.randint(100, 2000),
     "status": "ok"
 }
 
-with open("data/status.json", "w") as f:
-    json.dump(data, f, indent=2)
+os.makedirs("dashboard", exist_ok=True)
 
-# --- New: calculate GitHub repo usage ---
+with open("dashboard/status.json", "w") as f:
+    json.dump(status, f, indent=2)
+
+# --- Storage overview ---
 def get_repo_size(path="."):
     total = 0
     for dirpath, dirnames, filenames in os.walk(path):
@@ -21,6 +23,7 @@ def get_repo_size(path="."):
 used_mb = get_repo_size()
 
 storage = {
+    "last_updated": status["timestamp"],
     "storage_options": [
         {
             "name": "GitHub",
@@ -37,6 +40,5 @@ storage = {
     ]
 }
 
-# Save to dashboard folder for Pages
 with open("dashboard/storage.json", "w") as f:
     json.dump(storage, f, indent=2)

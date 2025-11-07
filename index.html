@@ -6,59 +6,54 @@
 </head>
 <body>
     <h1>⏳ Forever Automation Dashboard</h1>
+
+    <h2>Status</h2>
+    <button id="refresh-status">Refresh Status</button>
     <div id="status"></div>
 
     <h2>💾 Storage Overview</h2>
-<button id="refresh-storage">Refresh Storage Data</button>
-<div id="storage-overview"></div>
-
-<script>
-async function loadStorage() {
-  try {
-    const res = await fetch("./storage.json?cachebust=" + new Date().getTime());
-    const data = await res.json();
-    const table = `<table border="1" cellpadding="4">
-      <tr><th>Storage Option</th><th>Max Storage</th><th>Used Storage</th><th>Notes</th></tr>
-      ${data.storage_options.map(opt => `
-        <tr>
-          <td>${opt.name}</td>
-          <td>${opt.max_storage}</td>
-          <td>${opt.used_storage}</td>
-          <td>${opt.notes}</td>
-        </tr>
-      `).join("")}
-    </table>`;
-    document.getElementById("storage-overview").innerHTML = table;
-  } catch (err) {
-    document.getElementById("storage-overview").innerHTML = "<p>Error loading storage info.</p>";
-    console.error(err);
-  }
-}
-
-// initial load
-loadStorage();
-
-// refresh button
-document.getElementById("refresh-storage").addEventListener("click", loadStorage);
-</script>
+    <button id="refresh-storage">Refresh Storage Data</button>
+    <div id="storage-overview"></div>
 
     <script>
-        // Relative path to JSON, no username or repo hard-coded
-        const url = "./status.json";
-
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById("status").innerHTML = `
+    async function loadJSON(url, container) {
+        try {
+            const res = await fetch(url + "?cachebust=" + new Date().getTime());
+            const data = await res.json();
+            if(container === "status") {
+                document.getElementById(container).innerHTML = `
                     <p><strong>Last Run:</strong> ${data.timestamp}</p>
                     <p><strong>Status:</strong> ${data.status}</p>
                     <p><strong>Records Collected:</strong> ${data.records_collected}</p>
                 `;
-            })
-            .catch(err => {
-                document.getElementById("status").innerHTML = "<p>Error loading data.</p>";
-                console.error(err);
-            });
+            } else if(container === "storage-overview") {
+                const table = `<table border="1" cellpadding="4">
+                    <tr><th>Storage Option</th><th>Max Storage</th><th>Used Storage</th><th>Notes</th></tr>
+                    ${data.storage_options.map(opt => `
+                        <tr>
+                            <td>${opt.name}</td>
+                            <td>${opt.max_storage}</td>
+                            <td>${opt.used_storage}</td>
+                            <td>${opt.notes}</td>
+                        </tr>
+                    `).join("")}
+                </table>
+                <p><em>Last Updated: ${data.last_updated}</em></p>`;
+                document.getElementById(container).innerHTML = table;
+            }
+        } catch (err) {
+            document.getElementById(container).innerHTML = "<p>Error loading data.</p>";
+            console.error(err);
+        }
+    }
+
+    // Initial load
+    loadJSON("./status.json", "status");
+    loadJSON("./storage.json", "storage-overview");
+
+    // Refresh buttons
+    document.getElementById("refresh-status").addEventListener("click", () => loadJSON("./status.json", "status"));
+    document.getElementById("refresh-storage").addEventListener("click", () => loadJSON("./storage.json", "storage-overview"));
     </script>
 </body>
 </html>
